@@ -6,7 +6,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Realization\Array" />
       <Folder Include="Realization\DoublyLinkedList" />
       <Folder Include="Realization\Map" />
     </ItemGroup>
