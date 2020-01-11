@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace PersistentDataStructures.Interfaces
 {
     public interface IPersistentMap<TKey, TValue>
