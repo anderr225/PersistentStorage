@@ -2,10 +2,14 @@ namespace PersistentDataStructures.Interfaces
 {
     public interface IPersistentTrie<TValue>
     {
-        TValue Lookup(int index);
+        TValue Find(int index);
         
-        IPersistentTrie<TValue> UpdateOrAdd(int index, TValue value);
+        IPersistentTrie<TValue> Update(int index, TValue value);
         
-        IPersistentTrie<TValue> Remove(int index);
+        IPersistentTrie<TValue> Add(TValue value);
+        
+        IPersistentTrie<TValue> Pop();
+
+        int Length { get; }
     }
 }

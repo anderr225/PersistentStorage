@@ -17,17 +17,17 @@ namespace PersistentDataStructures.Realization.Array
             _trie = trie;
         }
 
-        public T Lookup(int index)
+        public T Find(int index)
         {
-            return _trie.Lookup(index);
+            return _trie.Find(index);
         }
 
         public IPersistentArray<T> Update(int index, T value)
         {
-            var updatedTrie = _trie.UpdateOrAdd(index, value);
+            var updatedTrie = _trie.Update(index, value);
             return new PersistentArray<T>(updatedTrie);
         }
 
-        public T this[int index] => Lookup(index);
+        public T this[int index] => Find(index);
     }
 }
