@@ -36,7 +36,7 @@ namespace PersistentDataStructures.Realization.Trie
         {
             return new TrieNode<T>(_branchFactor, Value)
             {
-                Nodes = Nodes
+                Nodes = Nodes.Clone() as TrieNode<T>[]
             };
         }
     }
