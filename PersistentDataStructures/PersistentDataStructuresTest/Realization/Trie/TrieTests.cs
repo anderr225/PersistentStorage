@@ -1,7 +1,7 @@
 using PersistentDataStructures.Realization.Trie;
 using Xunit;
 
-namespace TestProject1.Realization
+namespace TestProject1.Realization.Trie
 {
     public class TrieTests
     {
@@ -10,10 +10,10 @@ namespace TestProject1.Realization
         {
             const int insertedElement = 1;
             var trie = new PersistentTrie<int>(insertedElement);
-            
+
             Assert.Equal(insertedElement, trie.Find(0));
         }
-        
+
         [Fact]
         public void Should_FindElementsOutOfOneNode()
         {
@@ -22,19 +22,19 @@ namespace TestProject1.Realization
             insertedElements[10] = 22;
             insertedElements[31] = -5;
             var trie = new PersistentTrie<int>(insertedElements);
-            
+
             Assert.Equal(insertedElements[0], trie.Find(0));
             Assert.Equal(insertedElements[5], trie.Find(5));
             Assert.Equal(insertedElements[10], trie.Find(10));
             Assert.Equal(insertedElements[31], trie.Find(31));
         }
-        
+
         [Fact]
         public void Should_FindElementsOutOfThreeNodes()
         {
             int[] insertedElements = new int[77];
             var trie = new PersistentTrie<int>(insertedElements);
-            
+
             Assert.Equal(insertedElements[0], trie.Find(0));
             Assert.Equal(insertedElements[5], trie.Find(5));
             Assert.Equal(insertedElements[10], trie.Find(10));
@@ -43,7 +43,7 @@ namespace TestProject1.Realization
             Assert.Equal(insertedElements[63], trie.Find(63));
             Assert.Equal(insertedElements[70], trie.Find(70));
         }
-        
+
         [Fact]
         public void ShouldFindElementOutOfMillionElements()
         {
@@ -65,7 +65,7 @@ namespace TestProject1.Realization
             Assert.Equal(insertedElements[99999], trie.Find(99999));
             Assert.Equal(insertedElements[999999], trie.Find(999999));
         }
-        
+
         [Fact]
         public void Should_UpdateElementWithoutTouchingLastVersion()
         {
@@ -95,12 +95,12 @@ namespace TestProject1.Realization
             Assert.Equal(0, firstTrie.Find(0));
             Assert.Equal(2, secondTrie.Find(0));
             Assert.Equal(3, thirdTrie.Find(0));
-            
+
             Assert.Equal(1, firstTrie.Find(1));
             Assert.Equal(1, secondTrie.Find(1));
             Assert.Equal(1, thirdTrie.Find(1));
         }
-        
+
         [Fact]
         public void Should_AddFirstElement()
         {
@@ -111,7 +111,7 @@ namespace TestProject1.Realization
             Assert.Equal(1, secondTrie.Length);
             Assert.Equal(22, secondTrie.Find(0));
         }
-        
+
         [Fact]
         public void Should_IncreaseDepthWithAdd()
         {

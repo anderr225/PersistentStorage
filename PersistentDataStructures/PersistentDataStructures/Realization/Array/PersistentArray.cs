@@ -12,7 +12,7 @@ namespace PersistentDataStructures.Realization.Array
             _trie = new PersistentTrie<T>(initialValues);
         }
 
-        private PersistentArray(IPersistentTrie<T> trie)
+        public PersistentArray(IPersistentTrie<T> trie)
         {
             _trie = trie;
         }
