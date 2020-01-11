@@ -11,5 +11,7 @@ namespace PersistentDataStructures.Interfaces
         IPersistentTrie<TValue> Pop();
 
         int Length { get; }
+        
+        int Depth { get; }
     }
 }
