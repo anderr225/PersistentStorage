@@ -13,15 +13,17 @@ namespace PersistentDataStructures.Realization.Trie
 
         public int Length { get; private set; }
 
+        private int Capacity { get; }
+
         public int Depth
         {
             get
             {
-                switch (Length)
+                switch (Capacity)
                 {
                     case 0: return 0;
                     case 1: return 1;
-                    default: return (int) Math.Ceiling(Math.Log(Length, BranchFactor));
+                    default: return (int) Math.Ceiling(Math.Log(Capacity, BranchFactor));
                 }
             }
         }
@@ -30,19 +32,28 @@ namespace PersistentDataStructures.Realization.Trie
         {
             _rootNode = new TrieNode<T>(BranchFactor);
             Length = 0;
+            Capacity = 0;
         }
 
         public PersistentTrie(params T[] values)
         {
             // TODO rewrite this
-            IPersistentTrie<T> tmpTrie = new PersistentTrie<T>();
+            var tmpTrie = new PersistentTrie<T>();
             foreach (var value in values)
             {
-                tmpTrie = tmpTrie.Add(value);
+                tmpTrie = tmpTrie.Add(value) as PersistentTrie<T>;
             }
 
-            _rootNode = (tmpTrie as PersistentTrie<T>)?._rootNode;
-            Length = values.Length;
+            _rootNode = tmpTrie._rootNode;
+            Length = tmpTrie.Length;
+            Capacity = tmpTrie.Capacity;
+        }
+
+        private PersistentTrie(TrieNode<T> rootNode, int capacity, int length)
+        {
+            _rootNode = rootNode;
+            Capacity = capacity;
+            Length = length;
         }
 
         public T Find(int index)
@@ -59,7 +70,7 @@ namespace PersistentDataStructures.Realization.Trie
                 }
             }
 
-            return currentNode != null && currentNode[index & Mask].HasValue
+            return currentNode?[index & Mask] != null && currentNode[index & Mask].HasValue
                 ? currentNode[index & Mask].Value
                 : throw new IndexOutOfRangeException($"No element at index {index}");
         }
@@ -69,14 +80,44 @@ namespace PersistentDataStructures.Realization.Trie
             return Update(index, value, addNewNodesIfNeeded: false);
         }
 
+        public IPersistentTrie<T> Add(T value)
+        {
+            if (Length == 0)
+            {
+                return new PersistentTrie<T>(
+                    new TrieNode<T>(BranchFactor) {[0] = new TrieNode<T>(BranchFactor, value)}, BranchFactor, 1);
+            }
+
+            // Three different scenarios 
+            // Value can be put in the last node
+            if (IsThereRoomInLastNode())
+            {
+                return Update(Length, value);
+            }
+
+            // Value can be put in a new node, but depth is the same
+            if (IsThereRoomInTrie())
+            {
+                return Update(Length, value, addNewNodesIfNeeded: true);
+            }
+
+            // Current trie is full, we need to increase the depth
+            var newRootNode = new TrieNode<T>(BranchFactor)
+            {
+                Nodes = {[0] = _rootNode}
+            };
+            var newTrie = new PersistentTrie<T>(newRootNode, Capacity * BranchFactor, Length);
+            return newTrie.Update(Length, value, addNewNodesIfNeeded: true);
+        }
+
+        public IPersistentTrie<T> Pop()
+        {
+            throw new System.NotImplementedException();
+        }
+
         private IPersistentTrie<T> Update(int index, T value, bool addNewNodesIfNeeded)
         {
-            var updatedTrie = new PersistentTrie<T>
-            {
-                Length = Length,
-                _rootNode = _rootNode.Clone() as TrieNode<T>
-            };
-
+            var updatedTrie = new PersistentTrie<T>(_rootNode.Clone() as TrieNode<T>, Capacity, Length);
             var updatedTrieNode = updatedTrie._rootNode;
 
             for (var shift = Power * (Depth - 1); shift > 0; shift -= Power)
@@ -107,66 +148,8 @@ namespace PersistentDataStructures.Realization.Trie
             return updatedTrie;
         }
 
-        public IPersistentTrie<T> Add(T value)
-        {
-            if (Length == 0)
-            {
-                return new PersistentTrie<T>
-                {
-                    _rootNode = new TrieNode<T>(BranchFactor) {[0] = new TrieNode<T>(BranchFactor, value)},
-                    Length = 1
-                };
-            }
-            
-            // Three different scenarios 
-            // Value can be put in the last node
-            if (IsThereRoomInLastNode())
-            {
-                return Update(Length, value);
-            }
-            
-            // Value can be put in a new node, but depth is the same
-            if (IsThereRoomInTrie())
-            {
-                return Update(Length, value, addNewNodesIfNeeded: true);
-            }
+        private bool IsThereRoomInLastNode() => (Length % BranchFactor != 0) && IsThereRoomInTrie();
 
-            // Current trie is full, we need to increase the depth
-            var newTrie = new PersistentTrie<T>
-            {
-                Length = Length + 1,
-                _rootNode = new TrieNode<T>(BranchFactor)
-                {
-                    Nodes = {[0] = _rootNode}
-                }
-            };
-            // TODO rewrite this, hack with length is bad
-            var tmp = newTrie.Update(Length, value, addNewNodesIfNeeded: true) as PersistentTrie<T>;
-            tmp.Length -= 1;
-            return tmp;
-        }
-
-        public IPersistentTrie<T> Pop()
-        {
-            throw new System.NotImplementedException();
-        }
-
-
-        private bool IsThereRoomInLastNode()
-        {
-            return (Length % BranchFactor != 0) && IsThereRoomInTrie();
-        }
-
-        private bool IsThereRoomInTrie()
-        {
-            // There is no room in the trie if length is the power of a branching factor
-            if (Length == 1)
-            {
-                return BranchFactor > 1;
-            }
-
-            var floatPower = Math.Log(Length, BranchFactor);
-            return floatPower != (int)floatPower;
-        }
+        private bool IsThereRoomInTrie() => Length < Capacity;
     }
 }
